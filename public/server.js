@@ -20,7 +20,13 @@ const upload = multer({
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
+app.get('/privacy', (req, res) => {
+    res.sendFile(path.join(__dirname, 'privacy.html'));
+});
 
+app.get('/contact', (req, res) => {
+    res.sendFile(path.join(__dirname, 'contact.html'));
+});
 // طابور: LibreOffice يعمل بملف واحد في كل مرة لحماية الذاكرة
 let queue = Promise.resolve();
 function enqueue(task) {
