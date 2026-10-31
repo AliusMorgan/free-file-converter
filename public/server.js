@@ -21,6 +21,11 @@ const upload = multer({ dest: uploadDir });
 // تقديم ملفات الواجهة الأمامية من نفس مجلد وجود server.js الحالي
 app.use(express.static(__dirname));
 
+// توجيه الصفحة الرئيسية مباشرة إلى ملف index.html
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index.html'));
+});
+
 // مسار معالجة وتحويل الملفات
 app.post('/api/convert', upload.single('file'), async (req, res) => {
     if (!req.file) {
