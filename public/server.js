@@ -6,7 +6,7 @@ const fs = require('fs');
 const path = require('path');
 
 const app = express();
-const PORT = process.env.PORT || 1000;
+const PORT = process.env.PORT || 10000;
 
 // إعداد مجلدات التخزين المؤقت
 const uploadDir = path.join(__dirname, 'uploads');
