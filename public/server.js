@@ -1,4 +1,31 @@
-// مسار معالجة وتحويل الملفات النصية والوثائق
+const express = require('express');
+const multer = require('multer');
+const { PDFDocument, rgb } = require('pdf-lib');
+const fs = require('fs');
+const path = require('path');
+
+const app = express();
+const PORT = process.env.PORT || 10000;
+
+// إعداد مجلدات التخزين المؤقت
+const uploadDir = path.join(__dirname, 'uploads');
+const outputDir = path.join(__dirname, 'outputs');
+
+if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
+if (!fs.existsSync(outputDir)) fs.mkdirSync(outputDir, { recursive: true });
+
+// إعداد Multer لاستقبال الملفات
+const upload = multer({ dest: uploadDir });
+
+// تقديم ملفات الواجهة الأمامية من نفس مجلد server.js الحالي
+app.use(express.static(__dirname));
+
+// مسار الصفحة الرئيسية صراحةً لضمان عدم ظهور Cannot GET /
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index.html'));
+});
+
+// مسار معالجة وتحويل النصوص وملفات الـ MD
 app.post('/api/convert', upload.single('file'), async (req, res) => {
     if (!req.file) {
         return res.status(400).send('No file uploaded.');
@@ -7,30 +34,20 @@ app.post('/api/convert', upload.single('file'), async (req, res) => {
     const { format } = req.body;
     const inputPath = req.file.path;
     const originalName = req.file.originalname;
-    const fileExt = path.extname(originalName).toLowerCase();
     const outputFilename = `converted_${Date.now()}.${format}`;
     const outputPath = path.join(outputDir, outputFilename);
 
     try {
-        let textContent = '';
-
-        // قراءة الملف بحسب نوعه
-        if (fileExt === '.txt' || fileExt === '.md') {
-            textContent = fs.readFileSync(inputPath, 'utf8');
-        } else {
-            // كحل احتياطي آمن للملفات الأخرى، نقرأها كنص إن أمكن أو نضع تنبيه
-            textContent = fs.readFileSync(inputPath, 'utf8').replace(/[^\x20-\x7E\u0600-\u06FF\s]/g, '');
-        }
+        const textContent = fs.readFileSync(inputPath, 'utf8');
 
         if (format === 'pdf') {
             const pdfDoc = await PDFDocument.create();
-            const page = pdfDoc.addPage([595.28, 841.89]); // مقاس A4
+            const page = pdfDoc.addPage([595.28, 841.89]); // A4
             
-            // كتابة المحتوى بشكل آمن داخل ملف الـ PDF
-            page.drawText(textContent.substring(0, 1200), {
+            page.drawText(textContent.substring(0, 1500), {
                 x: 50,
                 y: 780,
-                size: 10,
+                size: 11,
                 color: rgb(0, 0, 0),
             });
 
@@ -43,7 +60,6 @@ app.post('/api/convert', upload.single('file'), async (req, res) => {
             fs.writeFileSync(outputPath, textContent);
         }
 
-        // إرسال الملف للعميل وتنظيف الملفات المؤقتة
         res.download(outputPath, (err) => {
             try {
                 if (fs.existsSync(inputPath)) fs.unlinkSync(inputPath);
@@ -59,4 +75,8 @@ app.post('/api/convert', upload.single('file'), async (req, res) => {
         } catch (e) {}
         res.status(500).send('Error processing file.');
     }
+});
+
+app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
 });
