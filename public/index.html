@@ -10,6 +10,8 @@
             --surface-color: #1e293b;
             --primary-color: #3b82f6;
             --primary-hover: #2563eb;
+            --ppt-color: #ea580c;
+            --ppt-hover: #c2410c;
             --text-color: #f8fafc;
             --text-muted: #94a3b8;
             --border-color: #334155;
@@ -29,24 +31,26 @@
             color: var(--text-color);
             min-height: 100vh;
             display: flex;
-            justify-content: center;
+            flex-direction: column;
+            justify-content: space-between;
             align-items: center;
-            padding: 16px;
+            padding: 24px 16px;
         }
 
         .container {
             width: 100%;
-            max-width: 520px;
+            max-width: 600px;
             background-color: var(--surface-color);
             border: 1px solid var(--border-color);
             border-radius: 16px;
             padding: 28px;
             box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.5);
+            margin: auto;
         }
 
         header {
             text-align: center;
-            margin-bottom: 24px;
+            margin-bottom: 28px;
         }
 
         header h1 {
@@ -61,20 +65,38 @@
             font-size: 0.875rem;
         }
 
-        form {
+        /* تخطيط البطاقات */
+        .tools-grid {
             display: flex;
             flex-direction: column;
-            gap: 16px;
+            gap: 20px;
+        }
+
+        .tool-card {
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.01);
+        }
+
+        .tool-card h3 {
+            font-size: 1.05rem;
+            margin-bottom: 12px;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
         .file-box {
             border: 2px dashed var(--border-color);
-            border-radius: 12px;
-            padding: 28px 16px;
+            border-radius: 10px;
+            padding: 20px 12px;
             text-align: center;
             cursor: pointer;
             background: rgba(255, 255, 255, 0.01);
             transition: all 0.2s ease;
+            margin-bottom: 14px;
         }
 
         .file-box:hover {
@@ -88,7 +110,7 @@
 
         .file-label {
             color: var(--text-muted);
-            font-size: 0.925rem;
+            font-size: 0.875rem;
             line-height: 1.4;
             word-break: break-all;
         }
@@ -99,66 +121,45 @@
             text-decoration: underline;
         }
 
-        select {
-            width: 100%;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            border: 1px solid var(--border-color);
-            padding: 12px 14px;
-            border-radius: 8px;
-            font-size: 0.95rem;
-            outline: none;
-            cursor: pointer;
-            transition: border-color 0.2s;
-        }
-
-        select:focus {
-            border-color: var(--primary-color);
-        }
-
-        optgroup {
-            font-weight: bold;
-            color: var(--primary-color);
-            background-color: var(--surface-color);
-        }
-
-        option {
-            color: var(--text-color);
-            background-color: var(--bg-color);
-            padding: 8px;
-        }
-
-        button {
+        .convert-btn {
             width: 100%;
             background-color: var(--primary-color);
             color: white;
             border: none;
-            padding: 13px;
+            padding: 11px;
             border-radius: 8px;
-            font-size: 1rem;
+            font-size: 0.95rem;
             font-weight: 600;
             cursor: pointer;
             transition: background-color 0.2s ease;
         }
 
-        button:hover {
+        .convert-btn:hover {
             background-color: var(--primary-hover);
         }
 
+        .ppt-btn {
+            background-color: var(--ppt-color);
+        }
+        .ppt-btn:hover {
+            background-color: var(--ppt-hover);
+        }
+
         .result-area {
-            margin-top: 16px;
+            margin-top: 12px;
             text-align: center;
         }
 
         .download-btn {
             display: block;
             width: 100%;
-            padding: 12px;
+            padding: 11px;
             background-color: var(--success-color);
             color: white;
             border-radius: 8px;
             text-decoration: none;
             font-weight: 600;
+            font-size: 0.95rem;
             transition: opacity 0.2s;
         }
 
@@ -167,8 +168,24 @@
         }
 
         .status-msg {
-            font-size: 0.875rem;
+            font-size: 0.85rem;
             color: var(--text-muted);
+        }
+
+        footer {
+            text-align: center;
+            padding: 16px;
+            width: 100%;
+            border-top: 1px solid var(--border-color);
+            color: var(--text-muted);
+            font-size: 13px;
+            margin-top: 20px;
+        }
+
+        footer a {
+            color: var(--primary-color);
+            text-decoration: none;
+            margin: 0 8px;
         }
     </style>
 </head>
@@ -176,71 +193,76 @@
 
     <div class="container">
         <header>
-            <h1>Text File Converter</h1>
-            <p>Fast, secure, server-side document & text processing.</p>
+            <h1>Document to PDF Converter</h1>
+            <p>Fast, secure, server-side document processing tools.</p>
         </header>
 
-        <form id="uploadForm">
-            <div class="file-box" onclick="document.getElementById('fileInput').click()">
-                <p class="file-label" id="fileLabel">Upload text or document (.txt, .md), or <span>browse</span></p>
-                <input type="file" id="fileInput" accept=".txt,.md" required>
+        <div class="tools-grid">
+            
+            <!-- أداة تحويل الوورد إلى PDF -->
+            <div class="tool-card">
+                <h3>📄 Word to PDF (.docx)</h3>
+                <form id="wordForm">
+                    <div class="file-box" onclick="document.getElementById('wordInput').click()">
+                        <p class="file-label" id="wordLabel">Upload Word file (.docx), or <span>browse</span></p>
+                        <input type="file" id="wordInput" accept=".docx" required>
+                    </div>
+                    <button type="submit" class="convert-btn" id="wordBtn" style="display: none;">Convert Word to PDF</button>
+                </form>
+                <div class="result-area" id="wordResult"></div>
             </div>
 
-            <select id="formatSelect" style="display: none;">
-                <!-- أدوات النصوص الأساسية المعتمدة -->
-                <optgroup label="📄 Text & Document Conversions">
-                    <option value="pdf">Convert to PDF</option>
-                    <option value="html">Convert to HTML</option>
-                    <option value="txt">Keep as Plain Text</option>
-                </optgroup>
-            </select>
+            <!-- أداة تحويل الباوربوينت إلى PDF -->
+            <div class="tool-card">
+                <h3>📊 PowerPoint to PDF (.pptx)</h3>
+                <form id="pptForm">
+                    <div class="file-box" onclick="document.getElementById('pptInput').click()">
+                        <p class="file-label" id="pptLabel">Upload PowerPoint file (.pptx), or <span>browse</span></p>
+                        <input type="file" id="pptInput" accept=".pptx" required>
+                    </div>
+                    <button type="submit" class="convert-btn ppt-btn" id="pptBtn" style="display: none;">Convert PowerPoint to PDF</button>
+                </form>
+                <div class="result-area" id="pptResult"></div>
+            </div>
 
-            <button type="submit" id="submitBtn" style="display: none;">Convert & Download</button>
-        </form>
+        </div>
 
-        <div class="result-area" id="resultArea"></div>
-
-        <footer style="text-align: center; padding: 20px; margin-top: 30px; border-top: 1px solid var(--border-color); color: var(--text-muted); font-size: 13px;">
+        <footer>
             <p>&copy; 2026 Cloud File Converter. All rights reserved.</p>
             <p style="margin-top: 6px;">
-                <a href="#" onclick="alert('Privacy Policy: All uploaded files are automatically deleted immediately after conversion for your security.'); return false;" style="color: var(--primary-color); text-decoration: none; margin: 0 8px;">Privacy Policy</a> | 
-                <a href="#" onclick="alert('Contact Us: You can reach out to the administrator via taegarubh@gmail.com'); return false;" style="color: var(--primary-color); text-decoration: none; margin: 0 8px;">Contact Us</a>
+                <a href="#" onclick="alert('Privacy Policy: All uploaded files are automatically deleted immediately after conversion for your security.'); return false;">Privacy Policy</a> | 
+                <a href="#" onclick="alert('Contact Us: You can reach out to the administrator via taegarubh@gmail.com'); return false;">Contact Us</a>
             </p>
         </footer>
     </div>
 
     <script>
-        const fileInput = document.getElementById('fileInput');
-        const fileLabel = document.getElementById('fileLabel');
-        const formatSelect = document.getElementById('formatSelect');
-        const submitBtn = document.getElementById('submitBtn');
-        const form = document.getElementById('uploadForm');
-        const resultArea = document.getElementById('resultArea');
+        // معالجة ملفات الوورد
+        const wordInput = document.getElementById('wordInput');
+        const wordLabel = document.getElementById('wordLabel');
+        const wordBtn = document.getElementById('wordBtn');
+        const wordForm = document.getElementById('wordForm');
+        const wordResult = document.getElementById('wordResult');
 
-        fileInput.addEventListener('change', (e) => {
+        wordInput.addEventListener('change', (e) => {
             if (e.target.files.length > 0) {
-                const file = e.target.files[0];
-                const fileName = file.name;
-
-                fileLabel.innerHTML = `Selected File: <strong>${fileName}</strong>`;
-                formatSelect.style.display = 'block';
-                submitBtn.style.display = 'block';
-                resultArea.innerHTML = '';
+                wordLabel.innerHTML = `Selected File: <strong>${e.target.files[0].name}</strong>`;
+                wordBtn.style.display = 'block';
+                wordResult.innerHTML = '';
             }
         });
 
-        form.addEventListener('submit', async (e) => {
+        wordForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            if (!fileInput.files[0]) return;
+            if (!wordInput.files[0]) return;
 
             const formData = new FormData();
-            formData.append('file', fileInput.files[0]);
-            formData.append('format', formatSelect.value);
+            formData.append('file', wordInput.files[0]);
 
-            resultArea.innerHTML = '<p class="status-msg">Processing file on secure cloud server...</p>';
+            wordResult.innerHTML = '<p class="status-msg">Processing Word file on secure server...</p>';
 
             try {
-                const response = await fetch('/api/convert', {
+                const response = await fetch('/api/word-to-pdf', {
                     method: 'POST',
                     body: formData
                 });
@@ -249,16 +271,63 @@
 
                 const blob = await response.blob();
                 const url = window.URL.createObjectURL(blob);
-                const originalName = fileInput.files[0].name.substring(0, fileInput.files[0].name.lastIndexOf('.')) || 'converted';
-                const outputName = `${originalName}_converted.${formatSelect.value}`;
+                const originalName = wordInput.files[0].name.substring(0, wordInput.files[0].name.lastIndexOf('.')) || 'document';
+                const outputName = `${originalName}_converted.pdf`;
 
-                resultArea.innerHTML = `
+                wordResult.innerHTML = `
                     <a href="${url}" download="${outputName}" class="download-btn">
-                        📥 Download Converted File (${formatSelect.value.toUpperCase()})
+                        📥 Download Converted PDF
                     </a>
                 `;
             } catch (err) {
-                resultArea.innerHTML = '<p class="status-msg" style="color: var(--error-color);">An error occurred during processing on the server.</p>';
+                wordResult.innerHTML = '<p class="status-msg" style="color: var(--error-color);">An error occurred during processing.</p>';
+            }
+        });
+
+        // معالجة ملفات الباوربوينت
+        const pptInput = document.getElementById('pptInput');
+        const pptLabel = document.getElementById('pptLabel');
+        const pptBtn = document.getElementById('pptBtn');
+        const pptForm = document.getElementById('pptForm');
+        const pptResult = document.getElementById('pptResult');
+
+        pptInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                pptLabel.innerHTML = `Selected File: <strong>${e.target.files[0].name}</strong>`;
+                pptBtn.style.display = 'block';
+                pptResult.innerHTML = '';
+            }
+        });
+
+        pptForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (!pptInput.files[0]) return;
+
+            const formData = new FormData();
+            formData.append('file', pptInput.files[0]);
+
+            pptResult.innerHTML = '<p class="status-msg">Processing PowerPoint file on secure server...</p>';
+
+            try {
+                const response = await fetch('/api/ppt-to-pdf', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!response.ok) throw new Error('Conversion failed');
+
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const originalName = pptInput.files[0].name.substring(0, pptInput.files[0].name.lastIndexOf('.')) || 'presentation';
+                const outputName = `${originalName}_converted.pdf`;
+
+                pptResult.innerHTML = `
+                    <a href="${url}" download="${outputName}" class="download-btn">
+                        📥 Download Converted PDF
+                    </a>
+                `;
+            } catch (err) {
+                pptResult.innerHTML = '<p class="status-msg" style="color: var(--error-color);">An error occurred during processing.</p>';
             }
         });
     </script>
