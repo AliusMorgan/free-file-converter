@@ -8,6 +8,10 @@ const path = require('path');
 const app = express();
 const PORT = process.env.PORT || 10000;
 
+app.listen(PORT, '0.0.0.0', () => {
+    console.log(`Server is running on port ${PORT}`);
+});
+
 // إعداد مجلدات التخزين المؤقت
 const uploadDir = path.join(__dirname, 'uploads');
 const outputDir = path.join(__dirname, 'outputs');
