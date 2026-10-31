@@ -2,13 +2,11 @@ FROM node:18-alpine
 
 WORKDIR /usr/src/app
 
-# نسخ ملف الاعتماديات من داخل مجلد public الحالي
-COPY public/package*.json ./
+COPY package*.json ./
 
-RUN npm install --production
+RUN npm install --omit=dev
 
-# نسخ كافة الملفات من داخل مجلد public إلى مسار العمل
-COPY public/ ./
+COPY . .
 
 EXPOSE 10000
 
