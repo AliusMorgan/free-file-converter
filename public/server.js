@@ -8,18 +8,18 @@ const path = require('path');
 const app = express();
 const PORT = process.env.PORT || 10000;
 
-// إعداد مجلدات التخزين المؤقت
+// إعداد مجلدات التخزين المؤقت في الجذر الحقيقي للسيرفر
 const uploadDir = path.join(__dirname, 'uploads');
 const outputDir = path.join(__dirname, 'outputs');
 
-if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir);
-if (!fs.existsSync(outputDir)) fs.mkdirSync(outputDir);
+if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
+if (!fs.existsSync(outputDir)) fs.mkdirSync(outputDir, { recursive: true });
 
 // إعداد Multer لاستقبال الملفات المرفوعة
 const upload = multer({ dest: uploadDir });
 
-// تقديم ملفات الواجهة الأمامية من مجلد public
-app.use(express.static(path.join(__dirname, 'public')));
+// تقديم ملفات الواجهة الأمامية من نفس مجلد وجود server.js الحالي
+app.use(express.static(__dirname));
 
 // مسار معالجة وتحويل الملفات
 app.post('/api/convert', upload.single('file'), async (req, res) => {
@@ -54,34 +54,41 @@ app.post('/api/convert', upload.single('file'), async (req, res) => {
                 await sharp(inputPath).toFormat(format).toFile(outputPath);
             }
         } 
-        // 2. معالجة النصوص وتحويلها إلى PDF (pdf-lib)
-        else if (mimeType === 'text/plain' || req.file.originalname.endsWith('.txt')) {
+        // 2. معالجة النصوص وتحويلها إلى PDF أو HTML
+        else if (mimeType === 'text/plain' || req.file.originalname.endsWith('.txt') || req.file.originalname.endsWith('.md')) {
+            const textContent = fs.readFileSync(inputPath, 'utf8');
             if (format === 'pdf') {
-                const textContent = fs.readFileSync(inputPath, 'utf8');
                 const pdfDoc = await PDFDocument.create();
                 const page = pdfDoc.addPage([600, 800]);
                 page.drawText(textContent.substring(0, 2000), { x: 50, y: 750, size: 12, color: rgb(0, 0, 0) });
                 const pdfBytes = await pdfDoc.save();
                 fs.writeFileSync(outputPath, pdfBytes);
             } else if (format === 'html') {
-                const textContent = fs.readFileSync(inputPath, 'utf8');
-                const htmlContent = `<!DOCTYPE html><html><body><pre>${textContent}</pre></body></html>`;
+                const htmlContent = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>Converted Text</title></head><body><pre>${textContent}</pre></body></html>`;
                 fs.writeFileSync(outputPath, htmlContent);
+            } else {
+                fs.writeFileSync(outputPath, textContent);
             }
         } else {
             fs.copyFileSync(inputPath, outputPath);
         }
 
-        // إرسال الملف المحول للعميل ثم تنظيف الملفات المؤقتة
+        // إرسال الملف المحول للعميل ثم تنظيف الملفات المؤقتة بأمان
         res.download(outputPath, (err) => {
-            if (fs.existsSync(inputPath)) fs.unlinkSync(inputPath);
-            if (fs.existsSync(outputPath)) fs.unlinkSync(outputPath);
+            try {
+                if (fs.existsSync(inputPath)) fs.unlinkSync(inputPath);
+                if (fs.existsSync(outputPath)) fs.unlinkSync(outputPath);
+            } catch (cleanupErr) {
+                console.error('Cleanup error:', cleanupErr);
+            }
         });
 
     } catch (error) {
-        console.error('Conversion error:', error);
-        if (fs.existsSync(inputPath)) fs.unlinkSync(inputPath);
-        if (fs.existsSync(outputPath)) fs.unlinkSync(outputPath);
+        console.error('Conversion error details:', error);
+        try {
+            if (fs.existsSync(inputPath)) fs.unlinkSync(inputPath);
+            if (fs.existsSync(outputPath)) fs.unlinkSync(outputPath);
+        } catch (cleanupErr) {}
         res.status(500).send('Error processing file.');
     }
 });
