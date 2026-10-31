@@ -176,18 +176,23 @@
 
     <div class="container">
         <header>
-            <h1>Cloud File Converter</h1>
-            <p>Fast, secure, server-side processing with zero ads.</p>
+            <h1>Text File Converter</h1>
+            <p>Fast, secure, server-side document & text processing.</p>
         </header>
 
         <form id="uploadForm">
             <div class="file-box" onclick="document.getElementById('fileInput').click()">
-                <p class="file-label" id="fileLabel">Drag & drop your file here, or <span>browse</span></p>
-                <input type="file" id="fileInput" required>
+                <p class="file-label" id="fileLabel">Upload text or document (.txt, .md), or <span>browse</span></p>
+                <input type="file" id="fileInput" accept=".txt,.md" required>
             </div>
 
             <select id="formatSelect" style="display: none;">
-                <!-- سيمتلئ الهيكل الشجري ديناميكياً بحسب نوع الملف المرفوع -->
+                <!-- أدوات النصوص الأساسية المعتمدة -->
+                <optgroup label="📄 Text & Document Conversions">
+                    <option value="pdf">Convert to PDF</option>
+                    <option value="html">Convert to HTML</option>
+                    <option value="txt">Keep as Plain Text</option>
+                </optgroup>
             </select>
 
             <button type="submit" id="submitBtn" style="display: none;">Convert & Download</button>
@@ -195,7 +200,6 @@
 
         <div class="result-area" id="resultArea"></div>
 
-        <!-- تذييل الصفحة (Footer) تم وضعه هنا بشكل صحيح ومنسق -->
         <footer style="text-align: center; padding: 20px; margin-top: 30px; border-top: 1px solid var(--border-color); color: var(--text-muted); font-size: 13px;">
             <p>&copy; 2026 Cloud File Converter. All rights reserved.</p>
             <p style="margin-top: 6px;">
@@ -217,54 +221,11 @@
             if (e.target.files.length > 0) {
                 const file = e.target.files[0];
                 const fileName = file.name;
-                const fileExt = fileName.split('.').pop().toLowerCase();
 
                 fileLabel.innerHTML = `Selected File: <strong>${fileName}</strong>`;
-                formatSelect.innerHTML = '';
                 formatSelect.style.display = 'block';
                 submitBtn.style.display = 'block';
                 resultArea.innerHTML = '';
-
-                // الشجرة التنظيمية حسب نوع الملف
-                if (file.type.startsWith('image/')) {
-                    formatSelect.innerHTML = `
-                        <optgroup label="🖼️ Image Conversions">
-                            <option value="png">Convert to PNG</option>
-                            <option value="jpeg">Convert to JPEG</option>
-                            <option value="webp">Convert to WEBP</option>
-                            <option value="pdf">Convert Image to PDF</option>
-                        </optgroup>
-                    `;
-                } else if (file.type === 'text/plain' || fileExt === 'txt' || fileExt === 'md') {
-                    formatSelect.innerHTML = `
-                        <optgroup label="📄 Document Conversions">
-                            <option value="pdf">Convert Text to PDF</option>
-                            <option value="html">Convert Text to HTML</option>
-                        </optgroup>
-                    `;
-                } else if (fileExt === 'docx' || fileExt === 'doc') {
-                    formatSelect.innerHTML = `
-                        <optgroup label="📄 Word Document Conversions">
-                            <option value="pdf">Convert Word to PDF</option>
-                            <option value="txt">Convert Word to Text (TXT)</option>
-                        </optgroup>
-                    `;
-                } else if (file.type.startsWith('video/') || fileExt === 'mp4' || fileExt === 'mkv' || fileExt === 'mov') {
-                    formatSelect.innerHTML = `
-                        <optgroup label="🎬 Video & Media Conversions">
-                            <option value="mp4">Optimize / Compress MP4</option>
-                            <option value="webm">Convert Video to WebM</option>
-                            <option value="gif">Extract Video to GIF</option>
-                            <option value="mp3">Extract Audio to MP3</option>
-                        </optgroup>
-                    `;
-                } else {
-                    formatSelect.innerHTML = `
-                        <optgroup label="📦 General Archive">
-                            <option value="zip">Compress into ZIP</option>
-                        </optgroup>
-                    `;
-                }
             }
         });
 
