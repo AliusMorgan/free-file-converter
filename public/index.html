@@ -1,1 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Free File Converter | Fast & Secure</title>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --surface-color: #1e293b;
+            --primary-color: #3b82f6;
+            --primary-hover: #2563eb;
+            --text-color: #f8fafc;
+            --text-muted: #94a3b8;
+            --border-color: #334155;
+            --success-color: #10b981;
+            --error-color: #ef4444;
+        }
 
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 16px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 520px;
+            background-color: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 28px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.5);
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        header h1 {
+            font-size: 1.6rem;
+            font-weight: 700;
+            margin-bottom: 6px;
+            color: #ffffff;
+        }
+
+        header p {
+            color: var(--text-muted);
+            font-size: 0.875rem;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .file-box {
+            border: 2px dashed var(--border-color);
+            border-radius: 12px;
+            padding: 28px 16px;
+            text-align: center;
+            cursor: pointer;
+            background: rgba(255, 255, 255, 0.01);
+            transition: all 0.2s ease;
+        }
+
+        .file-box:hover {
+            border-color: var(--primary-color);
+            background-color: rgba(59, 130, 246, 0.04);
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        .file-label {
+            color: var(--text-muted);
+            font-size: 0.925rem;
+            line-height: 1.4;
+            word-break: break-all;
+        }
+
+        .file-label span {
+            color: var(--primary-color);
+            font-weight: 600;
+            text-decoration: underline;
+        }
+
+        select {
+            width: 100%;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+            padding: 12px 14px;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            outline: none;
+            cursor: pointer;
+            transition: border-color 0.2s;
+        }
+
+        select:focus {
+            border-color: var(--primary-color);
+        }
+
+        optgroup {
+            font-weight: bold;
+            color: var(--primary-color);
+            background-color: var(--surface-color);
+        }
+
+        option {
+            color: var(--text-color);
+            background-color: var(--bg-color);
+            padding: 8px;
+        }
+
+        button {
+            width: 100%;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 13px;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        button:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .result-area {
+            margin-top: 16px;
+            text-align: center;
+        }
+
+        .download-btn {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            background-color: var(--success-color);
+            color: white;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: opacity 0.2s;
+        }
+
+        .download-btn:hover {
+            opacity: 0.9;
+        }
+
+        .status-msg {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>Cloud File Converter</h1>
+            <p>Fast, secure, server-side processing with zero ads.</p>
+        </header>
+
+        <form id="uploadForm">
+            <div class="file-box" onclick="document.getElementById('fileInput').click()">
+                <p class="file-label" id="fileLabel">Drag & drop your file here, or <span>browse</span></p>
+                <input type="file" id="fileInput" required>
+            </div>
+
+            <select id="formatSelect" style="display: none;">
+                <!-- سيمتلئ الهيكل الشجري ديناميكياً بحسب نوع الملف المرفوع -->
+            </select>
+
+            <button type="submit" id="submitBtn" style="display: none;">Convert & Download</button>
+        </form>
+
+        <div class="result-area" id="resultArea"></div>
+
+        <!-- تذييل الصفحة (Footer) تم وضعه هنا بشكل صحيح ومنسق -->
+        <footer style="text-align: center; padding: 20px; margin-top: 30px; border-top: 1px solid var(--border-color); color: var(--text-muted); font-size: 13px;">
+            <p>&copy; 2026 Cloud File Converter. All rights reserved.</p>
+            <p style="margin-top: 6px;">
+                <a href="#" onclick="alert('Privacy Policy: All uploaded files are automatically deleted immediately after conversion for your security.'); return false;" style="color: var(--primary-color); text-decoration: none; margin: 0 8px;">Privacy Policy</a> | 
+                <a href="#" onclick="alert('Contact Us: You can reach out to the administrator via taegarubh@gmail.com'); return false;" style="color: var(--primary-color); text-decoration: none; margin: 0 8px;">Contact Us</a>
+            </p>
+        </footer>
+    </div>
+
+    <script>
+        const fileInput = document.getElementById('fileInput');
+        const fileLabel = document.getElementById('fileLabel');
+        const formatSelect = document.getElementById('formatSelect');
+        const submitBtn = document.getElementById('submitBtn');
+        const form = document.getElementById('uploadForm');
+        const resultArea = document.getElementById('resultArea');
+
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                const file = e.target.files[0];
+                const fileName = file.name;
+                const fileExt = fileName.split('.').pop().toLowerCase();
+
+                fileLabel.innerHTML = `Selected File: <strong>${fileName}</strong>`;
+                formatSelect.innerHTML = '';
+                formatSelect.style.display = 'block';
+                submitBtn.style.display = 'block';
+                resultArea.innerHTML = '';
+
+                // الشجرة التنظيمية حسب نوع الملف
+                if (file.type.startsWith('image/')) {
+                    formatSelect.innerHTML = `
+                        <optgroup label="🖼️ Image Conversions">
+                            <option value="png">Convert to PNG</option>
+                            <option value="jpeg">Convert to JPEG</option>
+                            <option value="webp">Convert to WEBP</option>
+                            <option value="pdf">Convert Image to PDF</option>
+                        </optgroup>
+                    `;
+                } else if (file.type === 'text/plain' || fileExt === 'txt' || fileExt === 'md') {
+                    formatSelect.innerHTML = `
+                        <optgroup label="📄 Document Conversions">
+                            <option value="pdf">Convert Text to PDF</option>
+                            <option value="html">Convert Text to HTML</option>
+                        </optgroup>
+                    `;
+                } else if (fileExt === 'docx' || fileExt === 'doc') {
+                    formatSelect.innerHTML = `
+                        <optgroup label="📄 Word Document Conversions">
+                            <option value="pdf">Convert Word to PDF</option>
+                            <option value="txt">Convert Word to Text (TXT)</option>
+                        </optgroup>
+                    `;
+                } else if (file.type.startsWith('video/') || fileExt === 'mp4' || fileExt === 'mkv' || fileExt === 'mov') {
+                    formatSelect.innerHTML = `
+                        <optgroup label="🎬 Video & Media Conversions">
+                            <option value="mp4">Optimize / Compress MP4</option>
+                            <option value="webm">Convert Video to WebM</option>
+                            <option value="gif">Extract Video to GIF</option>
+                            <option value="mp3">Extract Audio to MP3</option>
+                        </optgroup>
+                    `;
+                } else {
+                    formatSelect.innerHTML = `
+                        <optgroup label="📦 General Archive">
+                            <option value="zip">Compress into ZIP</option>
+                        </optgroup>
+                    `;
+                }
+            }
+        });
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (!fileInput.files[0]) return;
+
+            const formData = new FormData();
+            formData.append('file', fileInput.files[0]);
+            formData.append('format', formatSelect.value);
+
+            resultArea.innerHTML = '<p class="status-msg">Processing file on secure cloud server...</p>';
+
+            try {
+                const response = await fetch('/api/convert', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!response.ok) throw new Error('Conversion failed');
+
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const originalName = fileInput.files[0].name.substring(0, fileInput.files[0].name.lastIndexOf('.')) || 'converted';
+                const outputName = `${originalName}_converted.${formatSelect.value}`;
+
+                resultArea.innerHTML = `
+                    <a href="${url}" download="${outputName}" class="download-btn">
+                        📥 Download Converted File (${formatSelect.value.toUpperCase()})
+                    </a>
+                `;
+            } catch (err) {
+                resultArea.innerHTML = '<p class="status-msg" style="color: var(--error-color);">An error occurred during processing on the server.</p>';
+            }
+        });
+    </script>
+</body>
+</html>
